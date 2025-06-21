@@ -10,7 +10,6 @@
   <material name="black"><color rgba="0 0 0 1"/></material>
   <material name="red"><color rgba="1 0 0 1"/></material>
 
-
   <!-- Base Link -->
   <link name="base_link"/>
 
@@ -21,28 +20,36 @@
     <origin xyz="0 0 0"/>
   </joint>
 
-  <link name="chassis">
-    <!-- Top Box ( -->
-    <visual>
-      <origin xyz="0 0 0.66"/>
-      <geometry>
-        <box size="0.255 0.285 0.74"/>
-      </geometry>
-      <material name="white"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0.66"/>
-      <geometry>
-        <box size="0.255 0.285 0.74"/>
-      </geometry>
-    </collision>
+  <link name="chassis"/>
 
-    <xacro:inertial_box mass="6.0" x="0.5" y="0.5" z="1.1">
-      <origin xyz="0 0 0.55" rpy="0 0 0"/>
-    </xacro:inertial_box>
-  </link>
+  <!-- Top Pillars Macro -->
+  <xacro:macro name="top_pillar" params="name x y z">
+    <joint name="${name}_joint" type="fixed">
+      <parent link="chassis"/>
+      <child link="${name}"/>
+      <origin xyz="${x} ${y} ${z}"/>
+    </joint>
+    <link name="${name}">
+      <visual>
+        <geometry><box size="0.02 0.02 0.74"/></geometry>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry><box size="0.02 0.02 0.74"/></geometry>
+      </collision>
+      <xacro:inertial_box mass="0.3" x="0.02" y="0.02" z="0.74">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </xacro:inertial_box>
+    </link>
+  </xacro:macro>
 
-  <!-- Pillars Macro -->
+  <!-- Top Four Pillars -->
+  <xacro:top_pillar name="top_pillar_fl" x="0.1175" y="0.1325" z="0.66"/>
+  <xacro:top_pillar name="top_pillar_fr" x="0.1175" y="-0.1325" z="0.66"/>
+  <xacro:top_pillar name="top_pillar_rl" x="-0.1175" y="0.1325" z="0.66"/>
+  <xacro:top_pillar name="top_pillar_rr" x="-0.1175" y="-0.1325" z="0.66"/>
+
+  <!-- Bottom Pillars Macro -->
   <xacro:macro name="pillar" params="name x y z">
     <joint name="${name}_joint" type="fixed">
       <parent link="chassis"/>
@@ -63,7 +70,7 @@
     </link>
   </xacro:macro>
 
-  <!-- Four Pillars -->
+  <!-- Four Bottom Pillars -->
   <xacro:pillar name="pillar_fl" x="0.24" y="0.23" z="0.145"/>
   <xacro:pillar name="pillar_fr" x="0.24" y="-0.23" z="0.145"/>
   <xacro:pillar name="pillar_rl" x="-0.24" y="0.23" z="0.145"/>
@@ -89,11 +96,34 @@
       </xacro:inertial_box>
     </link>
   </xacro:macro>
+<!--Top Plates Macro -->
+  <xacro:macro name="top_plate" params="name z">
+    <joint name="${name}_joint" type="fixed">
+      <parent link="chassis"/>
+      <child link="${name}"/>
+      <origin xyz="0 0 ${z}"/>
+    </joint>
+    <link name="${name}">
+      <visual>
+        <geometry><box size="0.25 0.28 0.01"/></geometry>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry><box size="0.255 0.285 0.01"/></geometry>
+      </collision>
+      <xacro:inertial_box mass="0.2" x="0.255" y="0.285" z="0.01">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </xacro:inertial_box>
+    </link>
+  </xacro:macro>
+   <!-- Top Plate -->
+<xacro:top_plate name="plate_top_cover" z="1.03"/>
 
   <!-- Three Plates -->
   <xacro:plate name="plate_bottom" z="0.005"/>
   <xacro:plate name="plate_middle" z="0.125"/>
   <xacro:plate name="plate_top" z="0.285"/>
+  
 
   <!-- Wheels Macro -->
   <xacro:macro name="wheel" params="name x y rpy_x rpy_y rpy_z direction">
