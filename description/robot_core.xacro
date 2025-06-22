@@ -127,16 +127,22 @@
 
   <!-- Wheels Macro -->
   <!-- Wheels Macro -->
-<xacro:macro name="wheel" params="name x y rpy_x rpy_y rpy_z direction mimic_joint:=none">
-  <joint name="${name}_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="${name}"/>
-    <origin xyz="${x} ${y} -0.015" rpy="${rpy_x} ${rpy_y} ${rpy_z}"/>
-    <axis xyz="0 0 ${direction}"/>
-    <xacro:if value="${mimic_joint != 'none'}">
-      <mimic joint="${mimic_joint}" multiplier="1.0"/>
-    </xacro:if>
-  </joint>
+<xacro:macro name="wheel" params="name x y rpy_x rpy_y rpy_z direction fixed:=false">
+  <xacro:if value="${fixed == 'true'}">
+    <joint name="${name}_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="${name}"/>
+      <origin xyz="${x} ${y} -0.015" rpy="${rpy_x} ${rpy_y} ${rpy_z}"/>
+    </joint>
+  </xacro:if>
+  <xacro:unless value="${fixed == 'true'}">
+    <joint name="${name}_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${name}"/>
+      <origin xyz="${x} ${y} -0.015" rpy="${rpy_x} ${rpy_y} ${rpy_z}"/>
+      <axis xyz="0 0 ${direction}"/>
+    </joint>
+  </xacro:unless>
   <link name="${name}">
     <visual>
       <geometry><cylinder radius="0.055" length="0.03"/></geometry>
@@ -150,13 +156,18 @@
     </xacro:inertial_cylinder>
   </link>
 </xacro:macro>
+
 <!-- Gazeboo -->
 
   <!-- Four Wheels -->
-  <xacro:wheel name="rear_left_wheel"  x="-0.13" y="0.135"  rpy_x="-${pi/2}" rpy_y="0" rpy_z="0" direction="1"/>
-  <xacro:wheel name="front_left_wheel" x="0.13"  y="0.135"  rpy_x="-${pi/2}" rpy_y="0" rpy_z="0" direction="1"/>
-  <xacro:wheel name="rear_right_wheel" x="-0.13" y="-0.135" rpy_x="${pi/2}"  rpy_y="0" rpy_z="0" direction="-1"/>
-  <xacro:wheel name="front_right_wheel" x="0.13" y="-0.135" rpy_x="${pi/2}" rpy_y="0" rpy_z="0" direction="-1"/>
+  <!-- Rear Wheels: motor-driven -->
+<xacro:wheel name="rear_left_wheel"  x="-0.13" y="0.135"  rpy_x="-${pi/2}" rpy_y="0" rpy_z="0" direction="1"/>
+<xacro:wheel name="rear_right_wheel" x="-0.13" y="-0.135" rpy_x="${pi/2}"  rpy_y="0" rpy_z="0" direction="-1"/>
+
+<!-- Front Wheels: fixed -->
+<xacro:wheel name="front_left_wheel" x="0.13"  y="0.135"  rpy_x="-${pi/2}" rpy_y="0" rpy_z="0" direction="1" fixed="true"/>
+<xacro:wheel name="front_right_wheel" x="0.13" y="-0.135" rpy_x="${pi/2}"  rpy_y="0" rpy_z="0" direction="-1" fixed="true"/>
+
 <!-- Gazebo Material Assignments -->
 
 <!-- Plates -->
@@ -182,7 +193,7 @@
 <!-- Wheels -->
 <gazebo reference="rear_left_wheel"><material>Gazebo/Blue</material></gazebo>
 <gazebo reference="rear_right_wheel"><material>Gazebo/Blue</material></gazebo>
-<gazebo reference="front_left_wheel"><material>Gazebo/Blue</material></gazebo>
-<gazebo reference="front_right_wheel"><material>Gazebo/Blue</material></gazebo>
+<gazebo reference="front_left_wheel"><material>Gazebo/Blue</material><mu1 value="0.001"/><mu2 value="0.001"/></gazebo>
+<gazebo reference="front_right_wheel"><material>Gazebo/Blue</material><mu1 value="0.001"/><mu2 value="0.001"/></gazebo>
 
 </robot>
